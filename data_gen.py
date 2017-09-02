@@ -142,11 +142,11 @@ def get_images_and_angles(samples, batch_size):
         camera_idx = np.random.randint(0, 3) # randomly choose one camera.
         line = samples[i]
         filename = line[camera_idx].split('/')[-1]
-        angle = line[3]
+        angle = float(line[3])
         if camera_idx == 1:
             angle += correction
         elif camera_idx == 2:
-            angle -= correction
+            angle += -correction
         images_and_angles.append((filename, angle))
     return images_and_angles
 
@@ -168,29 +168,29 @@ def generate_batch(samples, batch_size=32):
         yield X_batch, y_batch
 
 if __name__ == "__main__":
-    # samples = []
-    # with open('./data/driving_log.csv') as csvfile:
-    #     reader = csv.reader(csvfile)
-    #     for line in reader:
-    #         samples.append(line)
-    #     samples.pop(0) # Remove the first row, which is title of the form
-    # num_samples = len(samples)
+    samples = []
+    with open('./data/driving_log.csv') as csvfile:
+        reader = csv.reader(csvfile)
+        for line in reader:
+            samples.append(line)
+        samples.pop(0) # Remove the first row, which is title of the form
+    num_samples = len(samples)
 
-    # iteration = 0
-    # for x, y in generate_batch(samples):
-    #     print(x.shape)
-    #     cv2.imshow('image', x[0, :])
-    #     cv2.waitKey(0)
-    #     cv2.destroyAllWindows()
-    #     print(y)
-    #     iteration += 1
-    #     if iteration == 1:
-    #         break
+    iteration = 0
+    for x, y in generate_batch(samples):
+        print(x.shape)
+        # cv2.imshow('image', x[0, :])
+        # cv2.waitKey(0)
+        # cv2.destroyAllWindows()
+        print(y)
+        iteration += 1
+        if iteration == 1:
+            break
 
-    test_img_addr = './data/IMG/right_2016_12_01_13_46_38_294.jpg'
-    test_img = cv2.imread(test_img_addr)
-    print(test_img.shape)
-    cv2.imshow('image', test_img)
-    cv2.imshow('flip', augment_image_and_angle(test_img, 1)[0])
-    cv2.waitKey(0)
-    cv2.destroyAllWindows()
+    # test_img_addr = './data/IMG/right_2016_12_01_13_46_38_294.jpg'
+    # test_img = cv2.imread(test_img_addr)
+    # print(test_img.shape)
+    # cv2.imshow('image', test_img)
+    # cv2.imshow('flip', augment_image_and_angle(test_img, 1)[0])
+    # cv2.waitKey(0)
+    # cv2.destroyAllWindows()
