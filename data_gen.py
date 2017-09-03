@@ -63,13 +63,13 @@ def brightness_adjust(image):
     """
     _image = cv2.cvtColor(image, cv2.COLOR_RGB2HSV)
     _image = np.array(_image, dtype = np.float64)
-    random_brightness = 0.3 + np.random.random()
+    random_brightness = 0.25 + np.random.random()
     _image[:, :, 2] *= random_brightness
     _image = np.array(_image, dtype = np.uint8)
     _image = cv2.cvtColor(_image, cv2.COLOR_HSV2RGB)
     return _image
 
-def random_rotation(image, angle, rotation_angle=10):
+def random_rotation(image, angle, rotation_angle=15.0):
     """Returns rotated image and accordingly adjust steering angle.
 
     Args:
@@ -81,7 +81,8 @@ def random_rotation(image, angle, rotation_angle=10):
         Randomly rotated image and steering angle.
     """
     rand_rotate = np.random.uniform(-rotation_angle, rotation_angle + 1)
-    angle += rand_rotate
+    rad = np.pi / 180.0 * rand_rotate * -1.0
+    angle += rad
     rows, cols, _ = image.shape
     M = cv2.getRotationMatrix2D((cols / 2, rows / 2), 25, 1.2)
     image = cv2.warpAffine(image, M, (cols, rows), borderMode=1)
@@ -137,7 +138,7 @@ def get_images_and_angles(samples, batch_size):
     num_samples = len(samples)
     samples_idx = np.random.randint(0, num_samples, batch_size)
     images_and_angles = []
-    correction = 0.2
+    correction = 0.25
     for i in samples_idx:
         camera_idx = np.random.randint(0, 3) # randomly choose one camera.
         line = samples[i]
@@ -146,7 +147,7 @@ def get_images_and_angles(samples, batch_size):
         if camera_idx == 1:
             angle += correction
         elif camera_idx == 2:
-            angle += -correction
+            angle -= correction
         images_and_angles.append((filename, angle))
     return images_and_angles
 
@@ -160,6 +161,8 @@ def generate_batch(samples, batch_size=32):
             current_path = IMAGE_PATH + image_addr
             image = cv2.imread(current_path)
             aug_image, aug_angle = augment_image_and_angle(image, angle)
+            # aug_image = image
+            # aug_angle = angle
             X_batch.append(aug_image)
             y_batch.append(aug_angle)
 
@@ -168,29 +171,29 @@ def generate_batch(samples, batch_size=32):
         yield X_batch, y_batch
 
 if __name__ == "__main__":
-    samples = []
-    with open('./data/driving_log.csv') as csvfile:
-        reader = csv.reader(csvfile)
-        for line in reader:
-            samples.append(line)
-        samples.pop(0) # Remove the first row, which is title of the form
-    num_samples = len(samples)
+    # samples = []
+    # with open('./data/driving_log.csv') as csvfile:
+    #     reader = csv.reader(csvfile)
+    #     for line in reader:
+    #         samples.append(line)
+    #     samples.pop(0) # Remove the first row, which is title of the form
+    # num_samples = len(samples)
 
-    iteration = 0
-    for x, y in generate_batch(samples):
-        print(x.shape)
-        # cv2.imshow('image', x[0, :])
-        # cv2.waitKey(0)
-        # cv2.destroyAllWindows()
-        print(y)
-        iteration += 1
-        if iteration == 1:
-            break
+    # iteration = 0
+    # for x, y in generate_batch(samples):
+    #     print(x.shape)
+    #     cv2.imshow('image', x[0, :])
+    #     cv2.waitKey(0)
+    #     cv2.destroyAllWindows()
+    #     print(y)
+    #     iteration += 1
+    #     if iteration == 1:
+    #         break
 
-    # test_img_addr = './data/IMG/right_2016_12_01_13_46_38_294.jpg'
-    # test_img = cv2.imread(test_img_addr)
-    # print(test_img.shape)
-    # cv2.imshow('image', test_img)
-    # cv2.imshow('flip', augment_image_and_angle(test_img, 1)[0])
-    # cv2.waitKey(0)
-    # cv2.destroyAllWindows()
+    test_img_addr = './data/IMG/right_2016_12_01_13_46_38_294.jpg'
+    test_img = cv2.imread(test_img_addr)
+    print(test_img.shape)
+    cv2.imshow('image', test_img)
+    cv2.imshow('flip', augment_image_and_angle(test_img, 1)[0])
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
