@@ -39,7 +39,7 @@ def crop(image):
     Returns:
         A cropped version of original image (top 70 and bottom 25 are cropped).
     """
-    return image[50:140, :, :]
+    return image[55:135, :, :]
 
 def resize(image):
     """Returns a resized version of the original image.
@@ -114,11 +114,11 @@ def augment_image_and_angle(image, angle):
         augmented image and angle. Augmentation includes shear, crop, resize, 
         brightness adjust, rotation and flip based on the order.
     """
-    image, angle = random_shear(image, angle)
+    # image, angle = random_shear(image, angle)
     image = crop(image)
     image = resize(image)
     image = brightness_adjust(image)
-    image, angle = random_rotation(image, angle)
+    # image, angle = random_rotation(image, angle)
     image, angle = flip(image, angle)
 
     return image, angle
@@ -138,7 +138,7 @@ def get_images_and_angles(samples, batch_size):
     num_samples = len(samples)
     samples_idx = np.random.randint(0, num_samples, batch_size)
     images_and_angles = []
-    correction = 0.25
+    correction = 0.28
     for i in samples_idx:
         camera_idx = np.random.randint(0, 3) # randomly choose one camera.
         line = samples[i]
